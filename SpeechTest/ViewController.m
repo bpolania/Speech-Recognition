@@ -77,6 +77,8 @@
     recognitionTask = [speechRecognizer recognitionTaskWithRequest:recognitionRequest resultHandler:^(SFSpeechRecognitionResult * _Nullable result, NSError * _Nullable error) {
         BOOL isFinal = NO;
         if (result) {
+            // Whatever you say in the mic after pressing the button should be being logged
+            // in the console.
             NSLog(@"RESULT:%@",result.bestTranscription.formattedString);
             isFinal = !result.isFinal;
         }
