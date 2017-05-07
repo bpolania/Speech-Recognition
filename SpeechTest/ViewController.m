@@ -16,12 +16,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
     
+    // Initializr the Speech Recognizer with the locale, couldn't find a list of locales
+    // but I assume it's standard UTF-8 https://wiki.archlinux.org/index.php/locale
     speechRecognizer = [[SFSpeechRecognizer alloc] initWithLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"]];
     
+    // Set speech recognizer delegate
     speechRecognizer.delegate = self;
     
+    // Request the authorization to make sure the user is asked for premission, so you can
+    // get an authorized response remember to change the .plist file, check the repo's
+    // readme file or this projects info.plist
     [SFSpeechRecognizer requestAuthorization:^(SFSpeechRecognizerAuthorizationStatus status) {
         switch (status) {
             case SFSpeechRecognizerAuthorizationStatusAuthorized:
@@ -43,19 +48,29 @@
     
 }
 
+/*!
+ * @brief Starts listening and recognizing user input through the phone's muicrphone
+ */
+
 - (void)startRecording {
     
+    // Initialize the AVAudioEngine
     audioEngine = [[AVAudioEngine alloc] init];
     
+    // Make sure there's not a recognition task already running
     if (recognitionTask) {
         [recognitionTask cancel];
         recognitionTask = nil;
     }
     
+    // Starts an AVAudio Session
     NSError *error;
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setCategory:AVAudioSessionCategoryRecord error:&error];
     [audioSession setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    
+    // Starts a recognition process, in the block it logs the input or stops the audio
+    // process if thre's an error.
     recognitionRequest = [[SFSpeechAudioBufferRecognitionRequest alloc] init];
     AVAudioInputNode *inputNode = audioEngine.inputNode;
     recognitionRequest.shouldReportPartialResults = YES;
@@ -72,10 +87,14 @@
             recognitionTask = nil;
         }
     }];
+    
+    // Sets the recording format
     AVAudioFormat *recordingFormat = [inputNode outputFormatForBus:0];
     [inputNode installTapOnBus:0 bufferSize:1024 format:recordingFormat block:^(AVAudioPCMBuffer * _Nonnull buffer, AVAudioTime * _Nonnull when) {
         [recognitionRequest appendAudioPCMBuffer:buffer];
     }];
+    
+    // Starts the audio engine, i.e. it starts listening.
     [audioEngine prepare];
     [audioEngine startAndReturnError:&error];
     NSLog(@"Say Something, I'm listening");
