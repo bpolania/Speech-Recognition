@@ -52,7 +52,7 @@
  * @brief Starts listening and recognizing user input through the phone's muicrphone
  */
 
-- (void)startRecording {
+- (void)startListening {
     
     // Initialize the AVAudioEngine
     audioEngine = [[AVAudioEngine alloc] init];
@@ -107,7 +107,7 @@
         [audioEngine stop];
         [recognitionRequest endAudio];
     } else {
-        [self startRecording];
+        [self startListening];
     }
 }
 

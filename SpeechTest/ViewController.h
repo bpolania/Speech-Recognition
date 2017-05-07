@@ -6,6 +6,10 @@
 //  Copyright © 2017 Boris Polania. All rights reserved.
 //
 
+/*!
+ * Import the Speech framework and assign the Delegate
+ */
+
 #import <UIKit/UIKit.h>
 #import <Speech/Speech.h>
 
